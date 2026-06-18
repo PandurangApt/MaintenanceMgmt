@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firestore Collection Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h2>Income Directory</h2>
+        
+        <div class="action-bar">
+            <div class="upload-section">
+                <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+                <button id="uploadTriggerBtn" class="btn-primary">Choose JSON File</button>
+                <button id="bulkUploadBtn" class="btn-success" disabled>Upload to Firestore</button>
+                <span id="fileNameDisplay">No file selected</span>
+            </div>
+            
+            <button id="deleteAllBtn" class="btn-danger">Delete All</button>
+        </div>
+
+        <div id="statusMessage" class="message"></div>
+
+        <table id="usersTable">
+            <thead>
+                <tr>
+                    <th>Document ID</th>
+                    <td>RoomNo</td>
+					<td>TrnDate</td>
+					<td>PaymentMode</td>
+					<td>ReferenceNumber</td>
+					<td>Amount</td>
+					<td>Comments</td>
+					<td>CreatedDate</td>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="9" class="text-center">Loading data...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
