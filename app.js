@@ -2,10 +2,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { 
     getFirestore, 
     collection, 
+    query, 
+    where,
     getDocs, 
     doc, 
     deleteDoc, 
-    writeBatch 
+    writeBatch ,Timestamp 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -50,18 +52,17 @@ async function fetchAndRenderTable() {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${docSnap.id}</td>
-                <td>${data.RoomNo || 'N/A'}</td>
-                <td>${data.TrnDate || 'N/A'}</td>
-				<td>${data.PaymentMode || 'N/A'}</td>
-				<td>${data.ReferenceNumber || 'N/A'}</td>
-				<td>${data.Amount || 'N/A'}</td>
-				<td>${data.Comments || 'N/A'}</td>
-				<td>${data.CreatedDate || 'N/A'}</td>
-                <td><button class="btn-sm-danger" data-id="${docSnap.id}">Delete</button></td>
+                <td>${data.RoomNo || "N/A"}</td>
+                <td>${data.TrnDate?.toDate().toLocaleDateString() || "N/A"}</td>
+                <td>${data.PaymentMode || "N/A"}</td>
+                <td>${data.ReferenceNumber || "N/A"}</td>
+                <td>${data.Amount || "N/A"}</td>
+                <td>${data.Comments || "N/A"}</td>
+                <td>${data.CreatedDate?.toDate().toLocaleString() || "N/A"}</td>        
             `;
             tableBody.appendChild(row);
         });
-
+        //<td><button class="btn-sm-danger" data-id="${docSnap.id}">Delete</button></td>
         attachRowDeleteListeners();
     } catch (error) {
         showMessage("Failed to load Income data.", "error");
@@ -128,14 +129,17 @@ bulkUploadBtn.addEventListener('click', async () => {
             
             // Option B: Generate automatic unique Firestore random hashes as keys
             const docRef = doc(usersCollectionRef); 
+			
+            const jsTrnDate = new Date(item.date);
+            const timeStampTrnDate = Timestamp.fromDate(jsTrnDate);
             
             batch.set(docRef, {
-                RoomNo: item.RoomNo || "Anonymous",
-                TrnDate: item.TrnDate || "Anonymous",
-				PaymentMode: item.PaymentMode || "Anonymous",
-                ReferenceNumber: item.ReferenceNumber || "Anonymous",
-				Amount: item.Amount || "Anonymous",
-                Comments: item.Comments || "Anonymous",
+                RoomNo: item.room_no || "",
+                TrnDate: timeStampTrnDate || "",
+				PaymentMode: "Online" || "",
+                ReferenceNumber: "-" || "",
+				Amount: item.amount || "",
+                Comments: item.description || "",
                 CreatedDate: new Date()
             });
         });
@@ -180,4 +184,57 @@ function showMessage(text, type) {
 }
 
 // Boot setup
-fetchAndRenderTable();
+//fetchAndRenderTable();
+
+document.getElementById("applyFilterBtn").addEventListener("click", () => {
+    const roomNo = document.getElementById("filterRoomNo").value;
+    const fromDate = new Date(document.getElementById("filterFromDate").value);
+
+    if (roomNo && fromDate) {
+        fetchFilteredData(roomNo, fromDate);
+    } else {
+        showMessage("Please enter both Room No and From Date.", "error");
+    }
+});
+
+async function fetchFilteredData(roomNo, fromDate) {
+    try {
+        const fromTimestamp = Timestamp.fromDate(fromDate);
+
+        // Build query with filters
+        const q = query(
+            collection(db, "Income"),
+            where("RoomNo", "==", roomNo),
+            where("TrnDate", ">=", fromTimestamp)
+        );
+
+        const querySnapshot = await getDocs(q);
+        tableBody.innerHTML = "";
+
+        if (querySnapshot.empty) {
+            tableBody.innerHTML = `<tr><td colspan="9" class="text-center">No records found.</td></tr>`;
+            return;
+        }
+
+        querySnapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${docSnap.id}</td>
+                <td>${data.RoomNo || "N/A"}</td>
+                <td>${data.TrnDate?.toDate().toLocaleDateString() || "N/A"}</td>
+                <td>${data.PaymentMode || "N/A"}</td>
+                <td>${data.ReferenceNumber || "N/A"}</td>
+                <td>${data.Amount || "N/A"}</td>
+                <td>${data.Comments || "N/A"}</td>
+                <td>${data.CreatedDate?.toDate().toLocaleString() || "N/A"}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+        //<td><button class="btn-sm-danger" data-id="${docSnap.id}">Delete</button></td>
+        attachRowDeleteListeners();
+    } catch (error) {
+        console.error("Error fetching filtered data:", error);
+        showMessage("Failed to apply filters.", "error");
+    }
+}

@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firestore Collection Manager</title>
+    <title>Society Maintenance</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="container">
-        <h2>Income Directory</h2>
+        <h2>Society Maintenance</h2>
         
         <div class="action-bar">
             <div class="upload-section">
@@ -18,8 +18,13 @@
                 <button id="bulkUploadBtn" class="btn-success" disabled>Upload to Firestore</button>
                 <span id="fileNameDisplay">No file selected</span>
             </div>
-            
             <button id="deleteAllBtn" class="btn-danger">Delete All</button>
+        </div>
+
+        <div class="filter-bar">
+            <input type="text" id="filterRoomNo" placeholder="Enter Room No">
+            <input type="date" id="filterFromDate">
+            <button id="applyFilterBtn">Apply Filter</button>
         </div>
 
         <div id="statusMessage" class="message"></div>
@@ -35,7 +40,7 @@
 					<td>Amount</td>
 					<td>Comments</td>
 					<td>CreatedDate</td>
-                    <th>Action</th>
+                    <!-- <th>Action</th> -->
                 </tr>
             </thead>
             <tbody>
