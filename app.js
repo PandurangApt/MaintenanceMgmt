@@ -204,7 +204,7 @@ async function fetchFilteredData(roomNo, fromDate) {
         // Build query with filters
         const q = query(
             collection(db, "Income"),
-           // where("RoomNo", "==", roomNo),
+            where("RoomNo", "==", roomNo),
             where("TrnDate", ">=", fromTimestamp)
         );
 
