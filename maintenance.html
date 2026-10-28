@@ -334,10 +334,19 @@ window.resetData = function()
 };
 
 // EXPORT EXCEL
-window.exportExcel = function()
+window.exportExcelold = function()
 {
     const wb = XLSX.utils.table_to_book(document.getElementById("dataTable"),{ sheet:"Income"});
     const dt = new Date().toISOString().splitSX.writeFile(wb, `Mentainance_${dt}.xlsx`);
+};
+
+window.exportExcel = function() {
+    const wb = XLSX.utils.table_to_book(
+        document.getElementById("dataTable"),
+        { sheet: "Income" }
+    );
+    const dt = new Date().toISOString().split("T")[0];
+    XLSX.writeFile(wb, `Maintenance_${dt}.xlsx`);
 };
 
 //// AUTO LOAD DATA
