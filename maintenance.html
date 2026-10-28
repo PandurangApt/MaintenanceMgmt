@@ -242,10 +242,16 @@ function loadTable(records)
             createdDate = row.createdDate.toDate().toLocaleDateString("en-IN");
         }
 
+  let TrnDate = "";
+        if(row.TrnDate)
+		{
+            TrnDate = row.TrnDate.toDate().toLocaleDateString("en-IN");
+        }
+
         tbody.innerHTML += `
         <tr>
             <td>${row.RoomNo || ''}</td>
-            <td>${row.TrnDate || ''}</td>
+            <td>${TrnDate || ''}</td>
             <td>${row.PaymentMode || ''}</td>
             <td>${row.ReferenceNumber || ''}</td>
             <td>${row.Amount || ''}</td>
