@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Society Dashboard</title>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+}
+
+.container{
+    display:flex;
+    height:100vh;
+}
+
+.sidebar{
+    width:250px;
+    background:linear-gradient(180deg,#1E3A8A,#2563EB);
+    color:white;
+    padding:20px;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:40px;
+    text-align:center;
+}
+
+.menu{
+    list-style:none;
+}
+
+.menu li{
+    margin-bottom:15px;
+}
+
+.menu a{
+    text-decoration:none;
+    color:white;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px;
+    border-radius:10px;
+    transition:0.3s;
+}
+
+.menu a:hover{
+    background:rgba(255,255,255,0.2);
+}
+
+.main{
+    flex:1;
+    padding:20px;
+}
+
+.header{
+    background:white;
+    padding:15px 25px;
+    border-radius:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.header h2{
+    color:#333;
+}
+
+.dashboard-grid{
+    margin-top:25px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+    transition:0.3s;
+    cursor:pointer;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card i{
+    font-size:40px;
+    margin-bottom:15px;
+}
+
+.expense{
+    color:#10B981;
+}
+
+.maintenance{
+    color:#F59E0B;
+}
+
+.report{
+    color:#3B82F6;
+}
+
+.settings{
+    color:#8B5CF6;
+}
+
+.card h3{
+    margin-bottom:10px;
+    color:#333;
+}
+
+.card p{
+    color:#666;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">My Dashboard</div>
+        <ul class="menu">
+            <li>
+                <a href="index.html">
+                    <i class="fas fa-home"></i>Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="expenses.html">
+                    <i class="fas fa-money-bill-wave"></i>Expenses
+                </a>
+            </li>
+
+            <li>
+                <a href="maintenance.html">
+                    <i class="fas fa-tools"></i>Maintenance
+                </a>
+            </li>
+
+            <li>
+                <a href="reports.html">
+                    <i class="fas fa-chart-bar"></i>Reports
+                </a>
+            </li>
+
+            <li>
+                <a href="settings.html">
+                    <i class="fas fa-cog"></i>Settings
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <div class="header">
+            <h2>Society Dashboard</h2>
+            <span>Welcome</span>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card" onclick="location.href='expenses.html'">
+                <i class="fas fa-money-bill-wave expense"></i>
+                <h3>Expenses</h3>
+                <p>View expenses history.</p>
+            </div>
+
+            <div class="card" onclick="location.href='maintenance.html'">
+                <i class="fas fa-tools maintenance"></i>
+                <h3>Maintenance</h3>
+                <p>View maintenance history.</p>
+            </div>
+
+            <div class="card" onclick="location.href='reports.html'">
+                <i class="fas fa-chart-line report"></i>
+                <h3>Reports</h3>
+                <p>View reports and analytics.</p>
+            </div>
+
+            <div class="card" onclick="location.href='settings.html'">
+                <i class="fas fa-cogs settings"></i>
+                <h3>Settings</h3>
+                <p>Configure application settings.</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

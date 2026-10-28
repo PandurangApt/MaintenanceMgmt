@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maintenance Reporting</title>
+<!-- Excel Export Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+    padding:20px;
+}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+}
+
+.card{
+    background:#fff;
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 3px 15px rgba(0,0,0,0.1);
+}
+
+.header{
+    background:linear-gradient(135deg,#2563eb,#1e3a8a);
+    color:#fff;
+    padding:20px;
+}
+
+.header h2{
+    margin-bottom:5px;
+}
+
+.toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    padding:20px;
+    border-bottom:1px solid #ddd;
+}
+
+input[type="date"]{
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:8px;
+}
+
+button{
+    border:none;
+    color:white;
+    cursor:pointer;
+    padding:10px 15px;
+    border-radius:8px;
+    font-weight:600;
+}
+
+.search-btn{
+    background:#2563eb;
+}
+
+.reset-btn{
+    background:#dc2626;
+}
+
+.export-btn{
+    background:#16a34a;
+}
+
+.search-btn:hover{
+    background:#1d4ed8;
+}
+
+.reset-btn:hover{
+    background:#b91c1c;
+}
+
+.export-btn:hover{
+    background:#15803d;
+}
+
+.table-container{
+    padding:20px;
+    overflow:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    white-space:nowrap;
+}
+
+thead th{
+    background:#2563eb;
+    color:white;
+    padding:12px;
+    text-align:left;
+    position:sticky;
+    top:0;
+}
+
+tbody td{
+    padding:10px;
+    border-bottom:1px solid #eee;
+}
+
+tbody tr:nth-child(even){
+    background:#f9fafb;
+}
+
+tbody tr:hover{
+    background:#e0f2fe;
+}
+
+.active{
+    color:green;
+    font-weight:bold;
+}
+
+.inactive{
+    color:red;
+    font-weight:bold;
+}
+
+.loading{
+    text-align:center;
+    padding:20px;
+    font-weight:bold;
+    color:#2563eb;
+}
+
+.no-data{
+    text-align:center;
+    color:red;
+    font-weight:bold;
+}
+
+@media(max-width:768px)
+{
+    .toolbar{
+        flex-direction:column;
+    }
+
+    input,
+    button{
+        width:100%;
+    }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <h2>Maintenance Reporting</h2>
+            <!-- <p>Maintenance Reporting</p> -->
+        </div>
+
+        <div class="toolbar">
+            <input type="date" id="fromDate">
+            <input type="date" id="toDate">
+            <button class="search-btn" onclick="searchData()">Search </button>
+            <button class="reset-btn" onclick="resetData()">Reset</button>
+            <button class="export-btn" onclick="exportExcel()">Export Excel</button>
+        </div>
+
+        <div class="table-container">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Room No</th>
+                        <th>Trn Date</th>
+                        <th>Payment Mode</th>
+                        <th>Reference Number</th>
+                        <th>Amount</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="6" class="loading">
+                            Loading...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where, orderBy, Timestamp}from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+// FIREBASE CONFIGURATION
+const firebaseConfig = {
+    apiKey: "AIzaSyCl8OZPgVg5eUwfOmgOzgSY61kp6Tz-f3M",
+    authDomain: "housingsocietyapp-edbcb.firebaseapp.com",
+    databaseURL: "https://housingsocietyapp-edbcb-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "housingsocietyapp-edbcb",
+    storageBucket: "housingsocietyapp-edbcb.firebasestorage.app",
+    messagingSenderId: "1044547229709",
+    appId: "1:1044547229709:web:4d361eb54a21d298259d44"
+  };
+  
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// LOAD TABLE
+function loadTable(records)
+{
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+
+    if(records.length === 0)
+	{
+        tbody.innerHTML = `
+        <tr>
+            <td colspan="6" class="no-data">
+                No Records Found
+            </td>
+        </tr>
+        `;
+        return;
+    }
+
+    records.forEach(row => 
+	{
+        let createdDate = "";
+        if(row.createdDate)
+		{
+            createdDate = row.createdDate.toDate().toLocaleDateString("en-IN");
+        }
+
+        tbody.innerHTML += `
+        <tr>
+            <td>${row.RoomNo || ''}</td>
+            <td>${row.TrnDate || ''}</td>
+            <td>${row.PaymentMode || ''}</td>
+            <td>${row.ReferenceNumber || ''}</td>
+            <td>${row.Amount || ''}</td>
+            <td>${row.Comments || ''}</td>
+        </tr>
+        `;
+    });
+}
+
+// LOAD ALL DATA
+window.loadData = async function()
+{
+    try
+	{
+        const q = query(collection(db,"Income"), orderBy("TrnDate","desc"));
+        const snapshot = await getDocs(q);
+        let records = [];
+        snapshot.forEach(doc => {records.push({id:doc.id, ...doc.data()});});
+        loadTable(records);
+    }
+    catch(error)
+	{
+        console.error(error);
+        document.getElementById("tableBody").innerHTML = `
+        <tr>
+            <td colspan="6" style="color:red;text-align:center;">
+                Error loading data
+            </td>
+        </tr>`;
+    }
+};
+
+// SEARCH DIRECTLY IN FIRESTORE
+window.searchData = async function()
+{
+    try
+	{
+        const fromDate = document.getElementById("fromDate").value;
+        const toDate = document.getElementById("toDate").value;
+        let q;
+
+        if(fromDate && toDate)
+		{
+            const startDate = Timestamp.fromDate(new Date(fromDate));
+            const endDate = Timestamp.fromDate(new Date(toDate + "T23:59:59"));
+            
+			q = query(
+					collection(db,"Income"),
+					where("TrnDate", ">=", startDate),
+					where("TrnDate", "<=", endDate),
+					orderBy("TrnDate", "desc")
+				);
+        }
+        else
+		{
+            q = query(collection(db,"Income"), orderBy("TrnDate", "desc"));
+        }
+
+        const snapshot = await getDocs(q);
+        let records = [];
+        snapshot.forEach(doc => {records.push({id:doc.id, ...doc.data()});});
+        loadTable(records);
+    }
+    catch(error)
+	{
+        console.error(error);
+        alert("Error while searching records.");
+    }
+};
+
+// RESET
+window.resetData = function()
+{
+    document.getElementById("fromDate").value="";
+    document.getElementById("toDate").value="";
+    loadData();
+};
+
+// EXPORT EXCEL
+window.exportExcel = function()
+{
+    const wb = XLSX.utils.table_to_book(document.getElementById("dataTable"),{ sheet:"Income"});
+    const dt = new Date().toISOString().splitSX.writeFile(wb, `Mentainance_${dt}.xlsx`);
+};
+
+//// AUTO LOAD DATA
+//loadData();
+</script>
+</body>
+</html>
