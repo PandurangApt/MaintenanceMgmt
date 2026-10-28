@@ -268,7 +268,7 @@ window.loadData = async function()
 	{
         const q = query(collection(db,"Income"),
 orderBy("RoomNo","asc"),
- orderBy("TrnDate","desc"));
+ orderBy("TrnDate","asc"));
         const snapshot = await getDocs(q);
         let records = [];
         snapshot.forEach(doc => {records.push({id:doc.id, ...doc.data()});});
