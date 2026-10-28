@@ -305,7 +305,7 @@ window.searchData = async function()
 					where("TrnDate", ">=", startDate),
 					where("TrnDate", "<=", endDate),
 orderBy("RoomNo", "asc"),
-					orderBy("TrnDate", "desc")
+					orderBy("TrnDate", "asc")
 				);
         }
         else
