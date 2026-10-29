@@ -323,10 +323,19 @@ window.resetData = function()
 };
 
 // EXPORT EXCEL
-window.exportExcel = function()
+window.exportExcelold = function()
 {
     const wb = XLSX.utils.table_to_book(document.getElementById("dataTable"),{ sheet:"Expense"});
     const dt = new Date().toISOString().splitSX.writeFile(wb, `Expense_${dt}.xlsx`);
+};
+
+window.exportExcel = function() {
+    const wb = XLSX.utils.table_to_book(
+        document.getElementById("dataTable"),
+        { sheet: "Expenses" }
+    );
+    const dt = new Date().toISOString().split("T")[0];
+    XLSX.writeFile(wb, `Expenses_${dt}.xlsx`);
 };
 
 //// AUTO LOAD DATA
